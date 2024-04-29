@@ -478,12 +478,140 @@ def ising_main(population, alpha=None, external=0.0):
 This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
+import random
+import argparse
+import numpy as np
+import matplotlib.pyplot as plt
 
-def defuant_main():
-	#Your code for task 2 goes here
+def initilize(num_people):
+    # Generate a ramdom opinion for each person
+    return np.random.rand(num_people)
+
+def update(opinion,beta, threshold,num_iterations):
+    """
+    This function update the opinion if it satisfies.
+
+    parameter:
+    opinion(array of float):
+    the initial opinions of people
+    beta(int):
+    The coupling parameter
+    num_iteration(int):
+    the number of iteration
+    threshold(int):
+    The threshold parameter
+    """
+    # Create a list for the opinion value for each time iteration
+    opinion_over_time = []
+    for j in range(num_iterations):
+        # Choose a random person
+        i = np.random.randint(len(opinion))
+        # Ensure all the neighbour is in bounds
+        if i == 0:
+            neighbour = i + 1
+        elif i == (len(opinion) - 1):
+            neighbour = i - 1
+        else:
+            # Select random neighbour except for the first and last one
+            neighbour = (i+random.choice([-1,1]))
+            # Calculate the difference of their opinion
+        difference = opinion[i] - opinion[neighbour]
+
+        if abs(difference) < threshold:
+
+            # Update the opinion if they are eligible
+            opinion[i] += (beta * (opinion[neighbour] - opinion[i]))
+            opinion[neighbour] += (beta * (opinion[i] - opinion[neighbour]))
+        #put all the opinion in a list
+        opinion_over_time.append(opinion.copy())
+    return opinion_over_time
+
+
+
+
+def plot_opinion(opinion_over_time, num_iterations, beta, threshold):
+    """
+    This function takes four numbers as input and return the two graphs.
+    (hist and the iteration for opinion)
+
+    parameter:
+    opinion_over_time:
+    opinion for each person over the time
+    beta(int):
+    The coupling parameter
+    num_iteration(int):
+    the number of iteration
+    threshold(int):
+    The threshold parameter
+    """
+    fig = plt.figure()
+    ax1 = fig.add_subplot(1, 2, 1)
+    # Generate a histogram
+    ax1.hist(opinion_over_time[-1], bins=10)
+    # Set x and y label
+    ax1.set_xlabel('Opinion')
+    ax1.set_ylabel('Number')
+    # Set x_axis from 0 to 1
+    x_ticks = np.arange(0, 1.1, 0.2)
+    ax1.set_xticks(x_ticks)
+    ax2 = fig.add_subplot(1, 2, 2)
+    # Generate the second graph
+    ax2.plot(range(num_iterations), opinion_over_time, 'ro')
+    # Set x and y label
+    ax2.set_ylabel('Opinion')
+    ax2.set_xlabel('iteration')
+    # Set the headline
+    fig.suptitle(f'Coupling:{beta},Threshold:{threshold}')
+    plt.tight_layout()
+    plt.show()
+
+
+def defuant_main(beta, threshold):
+    """
+    main function to run the model
+    parameter:
+    beta: float
+    threshold: float
+    """
+    num_people = 100
+    num_iterations = 10000
+    opinion_over_time = update(initilize(num_people), beta, threshold,num_iterations)
+    plot_opinion(opinion_over_time, num_iterations, beta, threshold)
+
+
 
 def test_defuant():
-	#Your code for task 2 goes here
+    """
+    test the function with different parameters
+    """
+    defuant_main(0.5,0.5)
+    defuant_main(0.1, 0.5)
+    defuant_main(0.5, 0.1)
+    defuant_main(0.1, 0.2)
+def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Solve the defuant model")
+    parser.add_argument("-beta", type=float, default=0.2,
+                        help="Set the beta value here. Default: 0.2")
+    parser.add_argument("-threshold", type=float, default=0.2,
+                        help="Set the threshold value here. Default: 0.2")
+    parser.add_argument("-defuant",
+                        help="help run the defuant model.", action="store_true")
+    parser.add_argument("-test_defuant",
+                        help="help run the test model.", action="store_true")
+    args = parser.parse_args()
+    # run it if it mentions about this in the terminal
+    if args.defuant:
+        defuant_main(args.beta, args.threshold)
+    if args.test_defuant:
+         test_defuant()
+
+
+if __name__ == "__main__":
+    main()
+
+
+
 
 
 '''
