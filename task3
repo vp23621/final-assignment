@@ -1,0 +1,51 @@
+def get_mean_degree(self):
+  # summing up the length of the connections list for each Node in self.nodes
+  total_degree= sum(len(node.connections) for node in self.nodes)
+  mean_degree = total_degree / len(self.nodes)
+  return mean_degree
+
+ def get_mean_clustering(self):
+  clustering_coefficients = []
+
+  for node in self.nodes:
+   if len(node.connections) < 2:
+    # There may has a node with less than two connections and its clustering coefficient is 0
+    clustering_coefficients.append(0)
+    continue
+
+   # Calculates the number of possible links between neighbors.
+   neighbors = [i for i, is_connected in enumerate(node.connections) if is_connected]
+   possible_links = len(neighbors) * (len(neighbors) - 1) / 2
+   actual_links = sum(1 for i in range(len(neighbors))
+          for j in range(i + 1, len(neighbors))
+          if self.nodes[neighbors[i]].connections[neighbors[j]])
+
+   clustering_coefficients.append(actual_links / possible_links)
+
+  mean_clustering = sum(clustering_coefficients) / len(self.nodes)
+  return mean_clustering
+
+ def get_mean_path_length(self):
+  num_nodes = len(self.nodes)
+  path_lengths = [[float('inf') if i != j else 0 for j in range(num_nodes)] for i in range(num_nodes)]
+
+  # Set the distance for the direct connections.
+  for node in self.nodes:
+   for neighbor_index, connected in enumerate(node.connections):
+    if connected:
+     path_lengths[node.index][neighbor_index] = 1
+
+  # Implement the Floyd-Warshall algorithm to calculate the shortest distances between all pairs of node
+  for k in range(num_nodes):
+   for i in range(num_nodes):
+    for j in range(num_nodes):
+     path_lengths[i][j] = min(path_lengths[i][j], path_lengths[i][k] + path_lengths[k][j])
+
+  # Compute the mean path length.
+  total_path_length = sum(
+   sum(row[i] for i in range(num_nodes) if row[i] != float('inf')) for row in path_lengths)
+  count_paths = sum(
+   1 for row in path_lengths for i in range(num_nodes) if row[i] != float('inf') and i != row.index)
+
+  mean_path_length = total_path_length / count_paths
+  return mean_path_length
