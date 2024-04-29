@@ -1,5 +1,7 @@
 import matplotlib.cm as cm
-
+import matplotlib.cm as cm
+import numpy as np
+import matplotlib.pyplot as plt
 class Node:
 
 	def __init__(self, value, number, connections=None):
