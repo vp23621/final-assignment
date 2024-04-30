@@ -19,8 +19,8 @@ class Network:
         else:
             self.nodes = nodes 
 
-		def get_mean_degree(self):
-		# sum of all connections between nodes
+	def get_mean_degree(self):
+		# calculates the total degree by summing the number of connections each node has.
 		total_degree = sum(len([1 for connected in node.connections if connected]) for node in self.nodes)
 		# get mean degree
 		mean_degree = total_degree / len(self.nodes)
@@ -39,17 +39,17 @@ class Network:
 			neighbors = [i for i, is_connected in enumerate(node.connections) if is_connected]
 			possible_links = len(neighbors) * (len(neighbors) - 1) / 2
 
+			# Avoid division by zero if there are no possible links
 			if possible_links == 0:
-				# Avoid division by zero if there are no possible links
 				clustering_coefficients.append(0)
 				continue
 
-			# Count actual links between neighbors
+			# Calculate the number of direct connections between neighboring nodes
 			actual_links = sum(1 for i in range(len(neighbors))
 							   for j in range(i + 1, len(neighbors))
 							   if self.nodes[neighbors[i]].connections[neighbors[j]])
 
-			# Append the calculated clustering coefficient
+			# Calculate the clustering coefficient
 			clustering_coefficients.append(actual_links / possible_links)
 
 		if len(clustering_coefficients) == 0:
@@ -60,7 +60,7 @@ class Network:
 
 	def get_path_length(self):
 		num_nodes = len(self.nodes)
-		# Initialize the matrix for path lengths
+		# set the range of path length from 0 to positive infinity, in order to use the Floyd-Warshall algorithm.
 		path_lengths = [[float('inf') if i != j else 0 for j in range(num_nodes)] for i in range(num_nodes)]
 
 		# Set the distance for the direct connections
@@ -69,14 +69,14 @@ class Network:
 				if connected:
 					path_lengths[node.index][neighbor_index] = 1
 
-		# Implement the Floyd-Warshall algorithm to calculate the shortest distances between all pairs of nodes
+
 		for k in range(num_nodes):
 			for i in range(num_nodes):
 				for j in range(num_nodes):
 					if path_lengths[i][j] > path_lengths[i][k] + path_lengths[k][j]:
 						path_lengths[i][j] = path_lengths[i][k] + path_lengths[k][j]
 
-		# Compute the mean path length by considering all paths (not including infinities)
+		# Compute the mean path length by considering all paths
 		total_path_length = 0
 		count_paths = 0
 		for i in range(num_nodes):
