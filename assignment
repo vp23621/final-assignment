@@ -111,37 +111,41 @@ class Network:
 					self.nodes[neighbour_index].connections[index] = 1
 
 	def make_ring_network(self, N, neighbour_range=1):
-    		# If there are no nodes to add, exit the function
-    		if N == 0:
+		'''
+                This function makes a ring network of size N.
+                Each node is connected to neighbour with initial range of 1
+        	'''
+    		
+    		if N == 0:					     # If there are no nodes to add, exit the function
         		return
-
-		    # Create a list of N nodes, each with a random value
-		    self.nodes = [Node(np.random.random(), i, [0] * N) for i in range(N)]
-		    for (index, node) in enumerate(self.nodes):
-		        # Establish connections in a ring, within the specified neighbour range
-		        for j in range(1, neighbour_range + 1):
-		            left = (index - j) % N  # Find the left neighbour considering wrap-around
-		            right = (index + j) % N  # Find the right neighbour considering wrap-around
-		            node.connections[left] = 1  # Connect current node to the left neighbour
-		            node.connections[right] = 1  # Connect current node to the right neighbour
-		            self.nodes[left].connections[index] = 1  # Ensure bidirectional connection (left to current)
+	    
+		    self.nodes = [Node(np.random.random(), i, [0] * N) for i in range(N)]	# Create a list of N nodes, each with a random value
+		    for (index, node) in enumerate(self.nodes):   
+		        for j in range(1, neighbour_range + 1):	      # Establish connections in a ring, within the specified neighbour range
+		            left = (index - j) % N  		      # Find the left neighbour considering wrap-around
+		            right = (index + j) % N  		      # Find the right neighbour considering wrap-around
+		            node.connections[left] = 1  	      # Connect current node to the left neighbour
+		            node.connections[right] = 1  	      # Connect current node to the right neighbour
+		            self.nodes[left].connections[index] = 1   # Ensure bidirectional connection (left to current)
 		            self.nodes[right].connections[index] = 1  # Ensure bidirectional connection (right to current)
 
 	def make_small_world_network(self, N, re_wire_prob=0.2):
-	    # If there are no nodes to add, exit the function
-	    if N == 0:
+		'''
+                        This function makes a small world of size N.
+                        Each node's rewire probability is compared with the random probability to determine whether to connect
+        	'''
+	    
+	    if N == 0:		# If there are no nodes to add, exit the function
 	        return
-	    # First create a ring network with a neighbour range of 2
-	    self.make_ring_network(N, neighbour_range=2)
-	    for (index, node) in enumerate(self.nodes):
-	        # Consider each possible pair of nodes in the network
-	        for neighbour_index in range(N):
-	            # Check if there is no existing connection and they are not the same node
-	            if neighbour_index != index and node.connections[neighbour_index] == 0:
-	                # Randomly decide based on re_wire_prob whether to rewire this connection
-	                if np.random.random() < re_wire_prob:
-	                    rewire_to_index = np.random.randint(0, N)  # Choose a random node to rewire to
-	                    node.connections[rewire_to_index] = 1  # Establish the new connection
+	    self.make_ring_network(N, neighbour_range=2)	 # First create a ring network with a neighbour range of 2
+	    for (index, node) in enumerate(self.nodes):		        
+	        for neighbour_index in range(N):		 # Consider each possible pair of nodes in the network	
+	           
+	            if neighbour_index != index and node.connections[neighbour_index] == 0:	 # Check if there is no existing connection and they are not the same node
+	                
+	                if np.random.random() < re_wire_prob:			# Randomly decide based on re_wire_prob whether to rewire this connection
+	                    rewire_to_index = np.random.randint(0, N)  		# Choose a random node to rewire to
+	                    node.connections[rewire_to_index] = 1  		# Establish the new connection
 	                    self.nodes[rewire_to_index].connections[index] = 1  # Ensure the connection is bidirectional
 
 
