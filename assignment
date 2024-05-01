@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-
+import random
+import argparse
 
 class Node:
 
@@ -370,11 +371,6 @@ def ising_main(population, alpha=None, external=0.0):
 This section contains code for the Defuant Model - task 2 in the assignment
 ==============================================================================================================
 '''
-import random
-import argparse
-import numpy as np
-import matplotlib.pyplot as plt
-
 
 def initilize(num_people):
     # Generate a ramdom opinion for each person
