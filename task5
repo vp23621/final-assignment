@@ -42,9 +42,8 @@ def update_opinions(network, beta=0.5, threshold=0.5):
         neighbor = random.choice(node.connections)
         neighbor_node = network.nodes[neighbor]
         if abs(node.value - neighbor_node.value) < threshold:
-            temp = beta * (neighbor_node.value - node.value)
-            node.value += temp
-            neighbor_node.value -= temp
+            node.value += beta * (neighbor_node.value - node.value)
+            neighbor_node.value += beta * (node.value - neighbor_node.value)
 
 def plot_network(network, ax, positions):
     ax.clear()
@@ -112,6 +111,10 @@ def main():
     plt.title("Mean Opinion Over Time")
     plt.grid(True)
     plt.show()
+
+if __name__ == "__main__":
+    main()
+
 
 if __name__ == "__main__":
     main()
