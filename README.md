@@ -113,6 +113,34 @@ Usage:
 
 Task 4:
 
+# Small world networks
+
+Implementation:
+
+A ring_network is first made. The present node can connect to x nearby neighbours accordong to this code. Next, it builds a small world. In order to determine whether to link, it compares the random probability with the reconnection likelihood.
+
+
+Dependencies:
+- numPy
+- matplotlib.pyplot
+-matplotlib.cm
+- argparse
+
+Usage:
+- Run the simulation by executing the following command in your terminal:
+
+	$python Task4.py -ring_network [N]   	# This should create a ring network with a range of 1 and a size of N
+
+	$python Task4.py -small_world [N]	 #This should create a small-worlds network with default parameters
+
+ 	$python Task4.py -small_world [N]  -re_wire [P]      #This should create a small worlds network with a re-wiring probability of P
+
+	--N is the node numbers you input  (it's integer)
+	--P is the rewire probably you input (it's float number and <=1)
+
+	Example: $python Task4.py  -ring_network 10
+			$python  Task4.py  -small_world 10
+			$python  Task4.py  -small_world 10 -re_wire 0.1
 
 
 
