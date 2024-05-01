@@ -24,11 +24,11 @@ def update(opinion, beta, threshold, num_iterations):
     for j in range(num_iterations):
         # Choose a random person
         i = np.random.randint(len(opinion))
-        # Ensure all the neighbour is in bounds
+        # Ensure all the neighbour is in bounds, it's a circular boundary conditions.
         if i == 0:
-            neighbour = i + 1
+            neighbour =random.choice([i+1,len(opinion)-1])
         elif i == (len(opinion) - 1):
-            neighbour = i - 1
+            neighbour = random.choice([i - 1,0])
         else:
             # Select random neighbour except for the first and last one
             neighbour = (i + random.choice([-1, 1]))
