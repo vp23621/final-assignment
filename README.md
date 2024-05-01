@@ -113,7 +113,7 @@ Usage:
 
 Task 4:
 
-# Small world networks
+# small network
 
 Implementation:
 
