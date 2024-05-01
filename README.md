@@ -139,8 +139,10 @@ Usage:
 	--P is the rewire probably you input (it's float number and <=1)
 
 	Example: $python Task4.py  -ring_network 10
-			$python  Task4.py  -small_world 10
-			$python  Task4.py  -small_world 10 -re_wire 0.1
+
+		$python  Task4.py  -small_world 10
+  
+		$python  Task4.py  -small_world 10 -re_wire 0.1
 
 
 
