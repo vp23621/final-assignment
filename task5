@@ -1,0 +1,112 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import argparse
+import random
+
+class Node:
+    def __init__(self, value, index):
+        self.value = value  # 节点的初始意见值为随机
+        self.index = index  # 节点的索引
+        self.connections = []  # 节点的邻接列表
+
+class Network:
+    def __init__(self, size=10):
+        self.nodes = [Node(np.random.rand(), i) for i in range(size)]
+        self.size = size
+        self.node_colors = [node.value for node in self.nodes]  # 初始化节点颜色
+
+    def make_small_world_network(self, re_wire_prob=0.2, neighbor_range=2):
+        # 创建规则的环形网络
+        for node in self.nodes:
+            node.connections = [(node.index + i) % self.size for i in range(-neighbor_range, neighbor_range + 1) if i != 0]
+
+        # 重连机制增加小世界特性
+        for node in self.nodes:
+            for i in range(len(node.connections)):
+                if random.random() < re_wire_prob:
+                    new_connection = random.randint(0, self.size - 1)
+                    while new_connection == node.index or new_connection in node.connections:
+                        new_connection = random.randint(0, self.size - 1)
+                    node.connections[i] = new_connection
+
+    def update_node_colors(self):
+        self.node_colors = [node.value for node in self.nodes]
+
+def update_opinions(network, beta=0.5, threshold=0.5,num_iterations=100):
+    average_opinions = []
+    node = random.choice(network.nodes)
+    if node.connections:
+        neighbor = random.choice(node.connections)
+        neighbor_node = network.nodes[neighbor]
+        if abs(node.value - neighbor_node.value) < threshold:
+            node.value += beta * (neighbor_node.value - node.value)
+            neighbor_node.value += beta * (node.value - neighbor_node.value)
+            print(node.value)
+    for _ in range(num_iterations):
+        average_opinion = np.mean([node.value for node in network.nodes])
+        print(average_opinion)
+        average_opinions.append(average_opinion)
+    return average_opinions
+
+def plot_opinions(average_opinions):
+    plt.plot(average_opinions)
+    plt.xlabel('Iterations')
+    plt.ylabel('Average Opinion')
+    plt.title('Average Opinion Over Iterations')
+    plt.ylim(0.45,0.55)
+    plt.show()
+
+def plot_network(network, ax, positions):
+    ax.clear()
+    norm = plt.Normalize(0, 1)  # 使用固定的归一化范围
+    network.update_node_colors()  # 更新节点颜色
+    node_sizes = [100 for node in network.nodes]
+    scatter = ax.scatter(positions[:, 0], positions[:, 1], c=network.node_colors, cmap='viridis', edgecolor='k', norm=norm, s=node_sizes)
+    for node in network.nodes:
+        for neighbor in node.connections:
+            ax.plot([positions[node.index, 0], positions[neighbor, 0]],
+                    [positions[node.index, 1], positions[neighbor, 1]], color="gray", linestyle='dotted')
+
+    ax.set_aspect('equal')
+    ax.axis('off')
+    return scatter
+
+
+def update(frame, network, beta, threshold, positions, ax):
+    update_opinions(network, beta, threshold)
+    network.update_node_colors()  # 更新节点颜色
+    scatter = plot_network(network, ax, positions)
+
+    ax.set_title(f'Iteration: {frame + 1}')  # 更新标题为当前迭代次数
+
+    return scatter
+
+
+def main():
+    parser = argparse.ArgumentParser(description='Run the Defuant model on a small-world network.')
+    parser.add_argument('-size', type=int, default=10, help='Number of nodes in the network')
+    parser.add_argument('-beta', type=float, default=0.5, help='Convergence parameter')
+    parser.add_argument('-threshold', type=float, default=0.5, help='Threshold for influence')
+    parser.add_argument('-re_wire_prob', type=float, default=0.2,
+                        help='Probability of rewiring in the small-world network')
+    parser.add_argument('-steps', type=int, default=500, help='Number of steps to run the simulation')
+    args = parser.parse_args()
+
+    network = Network(size=args.size)
+    network.make_small_world_network(re_wire_prob=args.re_wire_prob)
+    average_opinions = update_opinions(network, beta=args.beta, threshold=args.threshold,num_iterations=args.steps)
+    plot_opinions(average_opinions)
+
+    positions = np.array(
+        [(np.cos(2 * np.pi * i / args.size), np.sin(2 * np.pi * i / args.size)) for i in range(args.size)])
+
+    fig, ax = plt.subplots()
+    plt.colorbar(plot_network(network, ax, positions))  # 显示颜色条
+
+    ani = FuncAnimation(fig, update, frames=np.arange(args.steps), fargs=(network, args.beta, args.threshold, positions, ax), interval=0.5, repeat=False)
+    plt.show()
+
+
+if __name__ == "__main__":
+        main()
