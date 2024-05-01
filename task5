@@ -42,10 +42,8 @@ def update_opinions(network, beta=0.5, threshold=0.5,num_iterations=100):
         if abs(node.value - neighbor_node.value) < threshold:
             node.value += beta * (neighbor_node.value - node.value)
             neighbor_node.value += beta * (node.value - neighbor_node.value)
-            print(node.value)
     for _ in range(num_iterations):
         average_opinion = np.mean([node.value for node in network.nodes])
-        print(average_opinion)
         average_opinions.append(average_opinion)
     return average_opinions
 
@@ -54,7 +52,6 @@ def plot_opinions(average_opinions):
     plt.xlabel('Iterations')
     plt.ylabel('Average Opinion')
     plt.title('Average Opinion Over Iterations')
-    plt.ylim(0.45,0.55)
     plt.show()
 
 def plot_network(network, ax, positions):
@@ -86,7 +83,7 @@ def update(frame, network, beta, threshold, positions, ax):
 def main():
     parser = argparse.ArgumentParser(description='Run the Defuant model on a small-world network.')
     parser.add_argument('-size', type=int, default=10, help='Number of nodes in the network')
-    parser.add_argument('-beta', type=float, default=0.5, help='Convergence parameter')
+    parser.add_argument('-beta', type=float, default=0.3, help='Convergence parameter')
     parser.add_argument('-threshold', type=float, default=0.5, help='Threshold for influence')
     parser.add_argument('-re_wire_prob', type=float, default=0.2,
                         help='Probability of rewiring in the small-world network')
