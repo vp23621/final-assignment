@@ -138,7 +138,8 @@ Usage:
 	--N is the node numbers you input  (it's integer)
 	--P is the rewire probably you input (it's float number and <=1)
 
-	Example: $python Task4.py  -ring_network 10
+	Example:
+		 $python Task4.py  -ring_network 10
 
 		$python  Task4.py  -small_world 10
   
