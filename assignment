@@ -342,50 +342,45 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def initilize(num_people):
     # Generate a ramdom opinion for each person
     return np.random.rand(num_people)
 
-def update(opinion,beta, threshold,num_iterations):
+
+def update(opinion, beta, threshold, num_iterations):
     """
-    This function update the opinion if it satisfies.
+    This function update the opinion if it satisfies and record the every opinion with the iteration
 
     parameter:
-    opinion(array of float):
-    the initial opinions of people
-    beta(int):
-    The coupling parameter
-    num_iteration(int):
-    the number of iteration
-    threshold(int):
-    The threshold parameter
+            opinion(array of float): the initial opinions of people
+            beta(int): The coupling parameter
+            num_iteration(int): the number of iteration
+            threshold(int): The threshold parameter
     """
     # Create a list for the opinion value for each time iteration
     opinion_over_time = []
     for j in range(num_iterations):
         # Choose a random person
         i = np.random.randint(len(opinion))
-        # Ensure all the neighbour is in bounds
+        # Ensure all the neighbour is in bounds, it's a circular boundary conditions.
         if i == 0:
-            neighbour = i + 1
+            neighbour =random.choice([i+1,len(opinion)-1])
         elif i == (len(opinion) - 1):
-            neighbour = i - 1
+            neighbour = random.choice([i - 1,0])
         else:
             # Select random neighbour except for the first and last one
-            neighbour = (i+random.choice([-1,1]))
+            neighbour = (i + random.choice([-1, 1]))
             # Calculate the difference of their opinion
         difference = opinion[i] - opinion[neighbour]
 
         if abs(difference) < threshold:
-
             # Update the opinion if they are eligible
             opinion[i] += (beta * (opinion[neighbour] - opinion[i]))
             opinion[neighbour] += (beta * (opinion[i] - opinion[neighbour]))
-        #put all the opinion in a list
+        # put all the opinion in a list
         opinion_over_time.append(opinion.copy())
     return opinion_over_time
-
-
 
 
 def plot_opinion(opinion_over_time, num_iterations, beta, threshold):
@@ -394,14 +389,10 @@ def plot_opinion(opinion_over_time, num_iterations, beta, threshold):
     (hist and the iteration for opinion)
 
     parameter:
-    opinion_over_time:
-    opinion for each person over the time
-    beta(int):
-    The coupling parameter
-    num_iteration(int):
-    the number of iteration
-    threshold(int):
-    The threshold parameter
+            opinion_over_time: opinion for each person over the time
+            beta(int): The coupling parameter
+            num_iteration(int): the number of iteration
+            threshold(int): The threshold parameter
     """
     fig = plt.figure()
     ax1 = fig.add_subplot(1, 2, 1)
@@ -429,24 +420,25 @@ def defuant_main(beta, threshold):
     """
     main function to run the model
     parameter:
-    beta: float
-    threshold: float
+            beta: float
+            threshold: float
     """
     num_people = 100
     num_iterations = 10000
-    opinion_over_time = update(initilize(num_people), beta, threshold,num_iterations)
+    opinion_over_time = update(initilize(num_people), beta, threshold, num_iterations)
     plot_opinion(opinion_over_time, num_iterations, beta, threshold)
-
 
 
 def test_defuant():
     """
     test the function with different parameters
     """
-    defuant_main(0.5,0.5)
+    defuant_main(0.5, 0.5)
     defuant_main(0.1, 0.5)
     defuant_main(0.5, 0.1)
     defuant_main(0.1, 0.2)
+
+
 
 
 '''
