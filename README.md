@@ -1,6 +1,39 @@
 Here are the total explanation about how to run our code correctly for task 1 to task 4.
 
 Task 1:
+This Python script provides a simulation of the Ising model to simulate opinion dynamics in a social context.  
+It includes functionalities for running the simulation with custom parameters and testing its components.
+
+Ising Model Simulation: Simulate the dynamics of opinions in a grid where each cell represents an individual's opinion, 
+influenced by their neighbors and external factors.
+
+Customizable Parameters: Adjust the influence of external factors and the tolerance level of society, which affects opinion changes.
+
+Visual Representation: View the simulation in real-time through a visual plot that updates as the simulation progresses.
+
+Testing: Run predefined tests to validate the correctness of the calculation functions.
+
+Useage
+You need following package:
+1. Numpy
+2.Matplotlib
+3.argparse
+
+To start the Ising model simulation with default settings: 
+$python Task1.py -ising_model
+
+ To specify the alpha (tolerance level) :
+$python Task1.py -ising_model -alpha 10
+
+To specify external influence parameters:
+$python Task1.py -ising_model -external -0.1
+
+To specify the alpha(tolerance level) and external influence parameters:
+For example 
+$python Task1.py -ising_model -alpha 0.001 -external -0.1
+
+To run tests to verify the functionality of the calculation methods used in the simulation:
+$ python Task1.py -test_ising
 
 
 
