@@ -24,9 +24,13 @@ You can run my model by typing this in terminal:
 Python Task2.py -defuant -beta[value] -threshold[value]
 
 Here are also four flags you can use here:
+
 1.-beta: default number is 0.2 
+
 2.-Threshold: default number is 0.2
+
 3.-defuant: [You can run this with default beta and threshold value]
+
 4.-test_defuant:[You can test the function with different parameters for beta and threshold]
 
 
