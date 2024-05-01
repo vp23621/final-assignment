@@ -477,36 +477,56 @@ This section contains code for the main function- you should write some code for
 '''
 
 def main():
-    parser = argparse.ArgumentParser(description='Run the Ising model simulation.')
-    parser.add_argument('-ising_model', action='store_true', help='Run the Ising model simulation')
-    parser.add_argument('-external', type=float, default=0.0, help='External influence on opinions')
-    parser.add_argument('-alpha', type=float, default=1.0, help='Tolerance level of society')
-    parser.add_argument('-test_ising', action='store_true',help='Run the test functions')
-    args = parser.parse_args()
+    parser1 = argparse.ArgumentParser(description='Run the Ising model simulation.')
+    parser2 = argparse.ArgumentParser(description="Solve the defuant model")
+    parser1.add_argument('-ising_model', action='store_true', help='Run the Ising model simulation')
+    parser1.add_argument('-external', type=float, default=0.0, help='External influence on opinions')
+    parser1.add_argument('-alpha', type=float, default=1.0, help='Tolerance level of society')
+    parser1.add_argument('-test_ising', action='store_true',help='Run the test functions')
+    args = parser1.parse_args()
     if args.test_ising:
         test_ising()
     if args.ising_model:
         size = (100, 100)  # Example size, can be changed as needed
         population = np.random.choice([-1, 1], size=size)
         ising_main(population, alpha=args.alpha, external=args.external)
-def main():
-    # Parse command-line arguments
-    parser = argparse.ArgumentParser(description="Solve the defuant model")
-    parser.add_argument("-beta", type=float, default=0.2,
+   
+    parser2.add_argument("-beta", type=float, default=0.2,
                         help="Set the beta value here. Default: 0.2")
-    parser.add_argument("-threshold", type=float, default=0.2,
+    parse2r.add_argument("-threshold", type=float, default=0.2,
                         help="Set the threshold value here. Default: 0.2")
-    parser.add_argument("-defuant",
+    parser2.add_argument("-defuant",
                         help="help run the defuant model.", action="store_true")
-    parser.add_argument("-test_defuant",
+    parser2.add_argument("-test_defuant",
                         help="help run the test model.", action="store_true")
-    args = parser.parse_args()
+    args = parser2.parse_args()
     # run it if it mentions this in the terminal
     if args.defuant:
         defuant_main(args.beta, args.threshold)
     if args.test_defuant:
         test_defuant()
 
+
+    parser4 = argparse.ArgumentParser(description="Create and draw networks")
+    parser4.add_argument("-ring_network",action='store_true',help="Create a ring network")
+    parser4.add_argument("-small_world",action='store_true',help="Create a small world network")
+    parser4.add_argument("-re_wire",type=float, default=0.2,help="the reconnection probability of small world network")
+    parser4.add_argument("node_number",type=int, default=10,nargs='?', help="Enter an integer")
+
+    args = parser.parse_args()
+    network = Network()
+
+    # Check if the 'ring_network' argument is specified in the command line inputs
+    if args.ring_network:
+        # Create a ring network using the number of nodes specified by 'args.node_number' and with defult value of neighbour_range=2
+        network.make_ring_network(N=args.node_number,neighbour_range=1)
+        network.plot()
+
+    # Check if the 'small_world' argument is specified in the command line inputs
+    elif args.small_world:
+        # Create a small world network using the number of nodes specified by 'args.node_number' and a re-wiring probability specified by 'args.re_wire'.
+        network.make_small_world_network(N=args.node_number,re_wire_prob=args.re_wire)
+        network.plot()
 
 if __name__=="__main__":
 	main()
