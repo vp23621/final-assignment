@@ -8,8 +8,6 @@ import random
 class Node:
     """
     Represents a node in a network.
-
-    Attributes:
         value (float): The initial opinion value of the node, set randomly.
         index (int): The unique index of the node within the network.
         connections (list): List of indices representing connections to other nodes.
@@ -24,8 +22,6 @@ class Node:
 class Network:
     """
     Represents a network of nodes.
-
-    Attributes:
         nodes (list): A list of Node objects.
         size (int): The number of nodes in the network.
         node_colors (list): Colors representing the current opinion values of the nodes.
@@ -39,8 +35,6 @@ class Network:
     def make_small_world_network(self, re_wire_prob=0.2, neighbor_range=2):
         """
         Creates a small-world network using initial regular ring topology and then rewiring edges with a given probability.
-
-        Args:
             re_wire_prob (float): Probability of rewiring each edge.
             neighbor_range (int): Number of neighbors on each side to connect in the initial ring.
         """
@@ -70,8 +64,6 @@ class Network:
 def update_opinions(network, beta=0.5, threshold=0.5):
     """
     Updates the opinions of two connected nodes based on their difference and the given parameters.
-
-    Args:
         network (Network): The network containing the nodes.
         beta (float): The convergence parameter, influencing how much nodes adjust their opinions.
         threshold (float): The maximum difference in opinion for which nodes influence each other.
@@ -116,8 +108,6 @@ def plot_network(network, ax, positions):
 def update(frame, network, beta, threshold, positions, ax, mean_opinions):
     """
     Function called by FuncAnimation to update the plot for each frame.
-
-    Args:
         frame (int): The current frame index (also used as the iteration count).
         network (Network): The network being simulated.
         beta (float): The convergence parameter.
@@ -125,9 +115,6 @@ def update(frame, network, beta, threshold, positions, ax, mean_opinions):
         positions (ndarray): The positions of nodes.
         ax (Axes): The matplotlib Axes object to plot on.
         mean_opinions (list): List to record the mean opinion after each frame.
-
-    Returns:
-        scatter (PathCollection): Updated scatter plot object.
     """
     update_opinions(network, beta, threshold)
     network.update_node_colors()  # Update node colors after opinion change
@@ -181,5 +168,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
