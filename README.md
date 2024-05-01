@@ -182,12 +182,15 @@ Usage:
  -  Run the simulation by executing the following command in your terminal:
     	python   Task5.py
 	
-	The color bar will give different colors from purple to yellow depending on the OPINION value from 0 to 1, displayed on each 	node.
+	The color bar will give different colors from purple to yellow depending on the OPINION value from 0 to 1, 		displayed on each node.
 	Size is 10, means the number of nodes.
 	Beta is 0.5, means the convergence parameter, fewer beta means opinions convergence slower.
-	Threshold is 0.5, means the Threshold for influence, higher threshold means higher frequency for changing opinion.
+	Threshold is 0.5, means the Threshold for influence, higher threshold means higher frequency for changing 		opinion.
 	Re_wire probability is 0.2.
-	Default is 100, means the number of iterations. 
+	Default is 100, means the number of iterations.
+
+ -  User should wait until the graph finish 150 iterations. All values of average opinions will only be shown after 150	    iterations updates finish. 
+    
 	
 	
 
@@ -197,12 +200,16 @@ Usage:
 	
 	This command runs tests to get Graph of  Average Opinion, and Graph of. Small World. 
 	Two graphs will be created:
-	First is the Average Opinion for every iteration.
-	In this graph, the average opinion values obtained in each iteration are recorded, and they form a graph, which converges to 	a straight line, which means that everyone's opinions converge after many discussions
-
-	Second is the Small world network, color of nodes will change during the process of iterations.
-	The color of the nodes in the graph will gradually change, the color will gradually become the same color, which represents 	the convergence of opinions between each individual
+	Frist is the Small world network, color of nodes will change during the process of iterations.
+	The color of the nodes in the graph will gradually change, the color will gradually become the same color,
+	which represents the convergence of opinions between each individual
 		
+	Second is the Average Opinion for every iteration.
+	In this graph, the average opinion values obtained in each iteration are recorded, and they form a graph,
+	which converges to a straight line, which means that everyone's opinions converge after many discussions
+
+
+ 	Defuant-use_network 10 should be shown in the terminal. 
 
 
 
