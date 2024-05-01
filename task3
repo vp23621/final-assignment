@@ -1,51 +1,163 @@
-def get_mean_degree(self):
-  # summing up the length of the connections list for each Node in self.nodes
-  total_degree= sum(len(node.connections) for node in self.nodes)
-  mean_degree = total_degree / len(self.nodes)
-  return mean_degree
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
- def get_mean_clustering(self):
-  clustering_coefficients = []
 
-  for node in self.nodes:
-   if len(node.connections) < 2:
-    # There may has a node with less than two connections and its clustering coefficient is 0
-    clustering_coefficients.append(0)
-    continue
+class Node:
 
-   # Calculates the number of possible links between neighbors.
-   neighbors = [i for i, is_connected in enumerate(node.connections) if is_connected]
-   possible_links = len(neighbors) * (len(neighbors) - 1) / 2
-   actual_links = sum(1 for i in range(len(neighbors))
-          for j in range(i + 1, len(neighbors))
-          if self.nodes[neighbors[i]].connections[neighbors[j]])
+    def __init__(self, value, number, connections=None):
+        self.index = number
+        self.connections = connections
+        self.value = value
 
-   clustering_coefficients.append(actual_links / possible_links)
 
-  mean_clustering = sum(clustering_coefficients) / len(self.nodes)
-  return mean_clustering
+class Network:
 
- def get_mean_path_length(self):
-  num_nodes = len(self.nodes)
-  path_lengths = [[float('inf') if i != j else 0 for j in range(num_nodes)] for i in range(num_nodes)]
+    def __init__(self, nodes=None):
 
-  # Set the distance for the direct connections.
-  for node in self.nodes:
-   for neighbor_index, connected in enumerate(node.connections):
-    if connected:
-     path_lengths[node.index][neighbor_index] = 1
+        if nodes is None:
+            self.nodes = []
+        else:
+            self.nodes = nodes
 
-  # Implement the Floyd-Warshall algorithm to calculate the shortest distances between all pairs of node
-  for k in range(num_nodes):
-   for i in range(num_nodes):
-    for j in range(num_nodes):
-     path_lengths[i][j] = min(path_lengths[i][j], path_lengths[i][k] + path_lengths[k][j])
+    def get_mean_degree(self):
+        """
+        The mean degree is computed as the average number of connections each node has.
+        This is done by summing the number of connections for each node and then dividing
+        by the total number of nodes.
+        """
 
-  # Compute the mean path length.
-  total_path_length = sum(
-   sum(row[i] for i in range(num_nodes) if row[i] != float('inf')) for row in path_lengths)
-  count_paths = sum(
-   1 for row in path_lengths for i in range(num_nodes) if row[i] != float('inf') and i != row.index)
+        # calculates the total degree by summing the number of connections each node has.
+        total_degree = sum(len([1 for connected in node.connections if connected]) for node in self.nodes)
+        # get mean degree
+        mean_degree = total_degree / len(self.nodes)
+        return mean_degree
 
-  mean_path_length = total_path_length / count_paths
-  return mean_path_length
+    def get_clustering(self):
+        """
+        The clustering coefficient for a node measures how close its neighbors are to being
+        a complete clique. This function calculates the coefficient for each node and returns
+        the average.
+        Nodes with less than two connections have a coefficient of 0 because
+        there can be no triangles formed with fewer than two connections.
+        """
+
+        clustering_coefficients = []
+
+        for node in self.nodes:
+            if len(node.connections) < 2:
+                # If a node has less than two connections, its clustering coefficient is 0
+                clustering_coefficients.append(0)
+                continue
+
+            # Calculates the number of possible links between neighbors
+            neighbors = [i for i, is_connected in enumerate(node.connections) if is_connected]
+            possible_links = len(neighbors) * (len(neighbors) - 1) / 2
+
+            # Avoid division by zero if there are no possible links
+            if possible_links == 0:
+                clustering_coefficients.append(0)
+                continue
+
+            # Calculate the number of direct connections between neighboring nodes
+            actual_links = sum(1 for i in range(len(neighbors))
+                               for j in range(i + 1, len(neighbors))
+                               if self.nodes[neighbors[i]].connections[neighbors[j]])
+
+            # Calculate the clustering coefficient
+            clustering_coefficients.append(actual_links / possible_links)
+
+        if len(clustering_coefficients) == 0:
+            return 0  # Return 0 if there are no clustering coefficients to average
+
+        mean_clustering = sum(clustering_coefficients) / len(self.nodes)
+        return mean_clustering
+
+    def get_path_length(self):
+        """
+        Utilizes the Floyd-Warshall algorithm to find the shortest path between all pairs of nodes.
+        Use a for loop to count all path length and divide it with counted path number to get the average path length.
+        If no paths are available (disconnected graph), it returns infinity.
+        """
+        num_nodes = len(self.nodes)
+        # set the range of path length from 0 to positive infinity, in order to use the Floyd-Warshall algorithm.
+        path_lengths = [[float('inf') if i != j else 0 for j in range(num_nodes)] for i in range(num_nodes)]
+
+        # Set the distance for the direct connections
+        for node in self.nodes:
+            for neighbor_index, connected in enumerate(node.connections):
+                if connected:
+                    path_lengths[node.index][neighbor_index] = 1
+
+        for k in range(num_nodes):
+            for i in range(num_nodes):
+                for j in range(num_nodes):
+                    if path_lengths[i][j] > path_lengths[i][k] + path_lengths[k][j]:
+                        path_lengths[i][j] = path_lengths[i][k] + path_lengths[k][j]
+
+        # Compute the mean path length by considering all paths
+        total_path_length = 0
+        count_paths = 0
+        for i in range(num_nodes):
+            for j in range(num_nodes):
+                if i != j and path_lengths[i][j] != float('inf'):
+                    total_path_length += path_lengths[i][j]
+                    count_paths += 1
+
+        if count_paths == 0:
+            return float('inf')  # Return infinity if no paths are available to average
+        mean_path_length = total_path_length / count_paths
+
+        # Round the mean path length to 15 decimal places
+        return round(mean_path_length, 15)
+
+
+
+def test_networks():
+    # Ring network
+    nodes = []
+    num_nodes = 10
+    for node_number in range(num_nodes):
+        connections = [0 for val in range(num_nodes)]
+        connections[(node_number - 1) % num_nodes] = 1
+        connections[(node_number + 1) % num_nodes] = 1
+        new_node = Node(0, node_number, connections=connections)
+        nodes.append(new_node)
+    network = Network(nodes)
+
+    print("Testing ring network")
+    assert (network.get_mean_degree() == 2), network.get_mean_degree()
+    assert (network.get_clustering() == 0), network.get_clustering()
+    assert (network.get_path_length() == 2.777777777777778), network.get_path_length()
+
+    nodes = []
+    num_nodes = 10
+    for node_number in range(num_nodes):
+        connections = [0 for val in range(num_nodes)]
+        connections[(node_number + 1) % num_nodes] = 1
+        new_node = Node(0, node_number, connections=connections)
+        nodes.append(new_node)
+    network = Network(nodes)
+
+    print("Testing one-sided network")
+    assert (network.get_mean_degree() == 1), network.get_mean_degree()
+    assert (network.get_clustering() == 0), network.get_clustering()
+    assert (network.get_path_length() == 5), network.get_path_length()
+
+    nodes = []
+    num_nodes = 10
+    for node_number in range(num_nodes):
+        connections = [1 for val in range(num_nodes)]
+        connections[node_number] = 0
+        new_node = Node(0, node_number, connections=connections)
+        nodes.append(new_node)
+    network = Network(nodes)
+
+    print("Testing fully connected network")
+    assert (network.get_mean_degree() == num_nodes - 1), network.get_mean_degree()
+    assert (network.get_clustering() == 1), network.get_clustering()
+    assert (network.get_path_length() == 1), network.get_path_length()
+
+    print("All tests passed")
+
+test_networks()
