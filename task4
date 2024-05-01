@@ -1,1 +1,147 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import argparse
 
+
+class Node:
+
+    def __init__(self, value, number, connections=None):
+        self.index = number
+        self.connections = connections
+        self.value = value
+
+class Network:
+
+    def __init__(self, nodes=None):
+
+        if nodes is None:
+            self.nodes = []
+        else:
+            self.nodes = nodes
+
+    def make_random_network(self, N, connection_probability=0.5):
+        '''
+        This function makes a *random* network of size N.
+        Each node is connected to each other node with probability p
+        '''
+
+        self.nodes = []
+        for node_number in range(N):
+            value = np.random.random()
+            connections = [0 for _ in range(N)]
+            self.nodes.append(Node(value, node_number, connections))
+
+        for (index, node) in enumerate(self.nodes):
+            for neighbour_index in range(index + 1, N):
+                if np.random.random() < connection_probability:
+                    node.connections[neighbour_index] = 1
+                    self.nodes[neighbour_index].connections[index] = 1
+
+    def make_ring_network(self, N, neighbour_range=1):
+        '''
+        This function makes a ring network of size N.
+        Each node is connected to neighbour with initial range of 1
+        '''
+
+        # If there are no nodes to add, exit the function
+        if N == 0:
+            return
+        # Create a list of N nodes, each with a random value
+        self.nodes = [Node(np.random.random(), i, [0] * N) for i in range(N)]
+        # Establish connections in a ring, within the specified neighbour range
+        for (index, node) in enumerate(self.nodes):
+            for j in range(1,neighbour_range + 1):
+                # Find the left neighbour considering wrap-around
+                left = (index - j) % N
+                # Find the right neighbour considering wrap-around
+                right = (index + j) % N
+                # Connect current node to the left neighbour
+                node.connections[left] = 1
+                # Connect current node to the right neighbour
+                node.connections[right] = 1
+                # Ensure bidirectional connection (left to current)
+                self.nodes[left].connections[index] = 1
+                # Ensure bidirectional connection (right to current)
+                self.nodes[right].connections[index] = 1
+
+    def make_small_world_network(self, N, re_wire_prob=0.2):
+        '''
+        This function makes a small world of size N.
+        Each node's rewire probability is compared with the random probability to determine whether to connect
+        '''
+
+        # If there are no nodes to add, exit the function
+        if N == 0:
+            return
+        # First create a ring network with a neighbour range of 2
+        self.make_ring_network(N, neighbour_range=2)
+        # Consider each possible pair of nodes in the network
+        for (index, node) in enumerate(self.nodes):
+            for neighbour_index in range(N):
+                # Check if there is no existing connection and they are not the same node
+                if neighbour_index != index and node.connections[neighbour_index] == 0:
+                    # Randomly decide based on re_wire_prob whether to rewire this connection
+                    if np.random.random() < re_wire_prob:
+                        # Choose a random node to rewire to
+                        rewire_to_index = np.random.randint(0, N)
+                        # Establish the new connection
+                        node.connections[rewire_to_index] = 1
+                        # Ensure the connection is bidirectional
+                        self.nodes[rewire_to_index].connections[index] = 1
+
+
+    def plot(self):
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+        ax.set_axis_off()
+
+        num_nodes = len(self.nodes)
+        network_radius = num_nodes * 10
+        ax.set_xlim([-1.1 * network_radius, 1.1 * network_radius])
+        ax.set_ylim([-1.1 * network_radius, 1.1 * network_radius])
+
+        for (i, node) in enumerate(self.nodes):
+            node_angle = i * 2 * np.pi / num_nodes
+            node_x = network_radius * np.cos(node_angle)
+            node_y = network_radius * np.sin(node_angle)
+
+            circle = plt.Circle((node_x, node_y), 1 * num_nodes, color=cm.hot(node.value))
+            ax.add_patch(circle)
+
+            for neighbour_index in range(i + 1, num_nodes):
+                if node.connections[neighbour_index]:
+                    neighbour_angle = neighbour_index * 2 * np.pi / num_nodes
+                    neighbour_x = network_radius * np.cos(neighbour_angle)
+                    neighbour_y = network_radius * np.sin(neighbour_angle)
+                    ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
+
+        plt.show()
+
+
+def main():
+
+    parser = argparse.ArgumentParser(description="Create and draw networks")
+    parser.add_argument("-ring_network",action='store_true',help="Create a ring network")
+    parser.add_argument("-small_world",action='store_true',help="Create a small world network")
+    parser.add_argument("-re_wire",type=float, default=0.2,help="the reconnection probability of small world network")
+    parser.add_argument("node_number",type=int, default=10,nargs='?', help="Enter an integer")
+
+    args = parser.parse_args()
+    network = Network()
+
+    # Check if the 'ring_network' argument is specified in the command line inputs
+    if args.ring_network:
+        # Create a ring network using the number of nodes specified by 'args.node_number' and with defult value of neighbour_range=2
+        network.make_ring_network(N=args.node_number,neighbour_range=1)
+        network.plot()
+
+    # Check if the 'small_world' argument is specified in the command line inputs
+    elif args.small_world:
+        # Create a small world network using the number of nodes specified by 'args.node_number' and a re-wiring probability specified by 'args.re_wire'.
+        network.make_small_world_network(N=args.node_number,re_wire_prob=args.re_wire)
+        network.plot()
+
+
+if __name__ == "__main__":
+    main()
