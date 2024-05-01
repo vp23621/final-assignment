@@ -489,6 +489,23 @@ def main():
         size = (100, 100)  # Example size, can be changed as needed
         population = np.random.choice([-1, 1], size=size)
         ising_main(population, alpha=args.alpha, external=args.external)
+def main():
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description="Solve the defuant model")
+    parser.add_argument("-beta", type=float, default=0.2,
+                        help="Set the beta value here. Default: 0.2")
+    parser.add_argument("-threshold", type=float, default=0.2,
+                        help="Set the threshold value here. Default: 0.2")
+    parser.add_argument("-defuant",
+                        help="help run the defuant model.", action="store_true")
+    parser.add_argument("-test_defuant",
+                        help="help run the test model.", action="store_true")
+    args = parser.parse_args()
+    # run it if it mentions this in the terminal
+    if args.defuant:
+        defuant_main(args.beta, args.threshold)
+    if args.test_defuant:
+        test_defuant()
 
 
 if __name__=="__main__":
