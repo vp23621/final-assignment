@@ -1,4 +1,5 @@
 Here are the total explanation about how to run our code correctly for task 1 to task 4.
+Link： https://github.com/vp23621/final-assignment.git
 
 Task 1:
 This Python script provides a simulation of the Ising model to simulate opinion dynamics in a social context.  
