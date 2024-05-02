@@ -20,20 +20,20 @@ You need following package:
 3.argparse
 
 To start the Ising model simulation with default settings: 
-$python Task1.py -ising_model
+$python Task1-4.py -ising_model
 
  To specify the alpha (tolerance level) :
-$python Task1.py -ising_model -alpha 10
+$python Task1-4.py -ising_model -alpha 10
 
 To specify external influence parameters:
-$python Task1.py -ising_model -external -0.1
+$python Task1-4.py -ising_model -external -0.1
 
 To specify the alpha(tolerance level) and external influence parameters:
 For example 
-$python Task1.py -ising_model -alpha 0.001 -external -0.1
+$python Task1-4.py -ising_model -alpha 0.001 -external -0.1
 
 To run tests to verify the functionality of the calculation methods used in the simulation:
-$ python Task1.py -test_ising
+$ python Task1-4.py -test_ising
 
 
 
@@ -57,7 +57,7 @@ Dependencies:
 
 Usage:
 You can run my model by typing this in terminal:
-Python Task2.py -defuant -beta[value] -threshold[value]
+Python Task1-4.py -defuant -beta[value] -threshold[value]
 
 Here are also four flags you can use here:
 
@@ -97,16 +97,13 @@ Requirements:
 
 
 Usage:
- -  Run the simulation by executing the following command in your terminal:
-    	python   Task3.py
+
 	
 	There are three tests to get three sets of answers. It can only pass the test if Mean Degree, Mean 	Clustering Coefficient and Mean Path Length have same values that are asked.
 
 
-- Run tests by executing the following command in your terminal:
-    python    Task3.py
 	
-	This command runs tests to get Mean Degree, Mean Clustering Coefficient and Mean Path Length. The 	result should be:
+	This command runs tests to get Mean Degree, Mean Clustering Coefficient and Mean Path Length. The result should be:
 	Testing ring network
 	Testing one-sided network
 	Testing fully connected network
