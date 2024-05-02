@@ -138,22 +138,22 @@ Dependencies:
 Usage:
 - Run the simulation by executing the following command in your terminal:
 
-	$python Task4.py -ring_network [N]   	# This should create a ring network with a range of 1 and a size of N
+	$python Task1-4.py -ring_network [N]   	# This should create a ring network with a range of 1 and a size of N
 
-	$python Task4.py -small_world [N]	 #This should create a small-worlds network with default parameters
+	$python Task1-4.py -small_world [N]	 #This should create a small-worlds network with default parameters
 
- 	$python Task4.py -small_world [N]  -re_wire [P]      #This should create a small worlds network with a re-wiring probability of P
+ 	$python Task1-4.py -small_world [N]  -re_wire [P]      #This should create a small worlds network with a re-wiring probability of P
 
 	--N is the node numbers you input  (it's integer)
 	--P is the rewire probably you input (it's float number and <=1)
 
 	Example:
 
-		 $python Task4.py  -ring_network 10
+		 $python Task1-4.py  -ring_network 10
 
-		$python  Task4.py  -small_world 10
+		$python  Task1-4.py  -small_world 10
   
-		$python  Task4.py  -small_world 10 -re_wire 0.1
+		$python  Task1-4.py  -small_world 10 -re_wire 0.1
 
 
 
