@@ -5,28 +5,22 @@ import argparse
 
 def calculate_agreement(population, row, col, external=0.0):
     '''
-    	This function should return the extent to which a cell agrees with its neighbours.
-    	Inputs: population (numpy array)
-    			row (int)
-    			col (int)
-    			external (float)
-    	Returns:
-    			change_in_agreement (float)
+    This function calculates the extent to which a cell in the population grid agrees with its neighbors,
+    considering an optional external influence.
     '''
-    n_rows, n_cols = population.shape
-    # Current cell's opinion
-    cell_opinion = population[row, col]
+    n_rows, n_cols = population.shape  # To get dimensions of the population grid
+    cell_opinion = population[row, col]  # Opinion of the current cell
 
-    # Sum opinions of the neighbors
-    # np.roll shifts the array and wraps around the boundary, effectively considering periodic boundaries
+    # Summing up the opinions of the direct neighbors using periodic boundary conditions
+    #The % operator here implements index cycling, so that even marginal cells can find their ‘ring’ neighbours.
     neighbor_opinions = (
-            population[(row - 1) % n_rows, col] +  # Up
-            population[(row + 1) % n_rows, col] +  # Down
-            population[row, (col - 1) % n_cols] +  # Left
-            population[row, (col + 1) % n_cols]  # Right
+        population[(row - 1) % n_rows, col] +  # Up neighbor
+        population[(row + 1) % n_rows, col] +  # Down neighbor
+        population[row, (col - 1) % n_cols] +  # Left neighbor
+        population[row, (col + 1) % n_cols]    # Right neighbor
     )
 
-    # Calculate the agreement with external influence taken into account
+    # Compute agreement considering external influence
     agreement = (neighbor_opinions + external) * cell_opinion
 
     return agreement
@@ -34,86 +28,87 @@ def calculate_agreement(population, row, col, external=0.0):
 
 def ising_step(population, external=0.0, alpha=1.0):
     '''
-    	This function will perform a single update of the Ising model
-    	Inputs: population (numpy array)
-    			external (float) - optional - the magnitude of any external "pull" on opinion
+    Performs a single update step in the Ising model simulation,
+    deciding whether a selected cell should flip its state.
     '''
     n_rows, n_cols = population.shape
-    row = np.random.randint(0, n_rows)
-    col = np.random.randint(0, n_cols)
-    agreement = calculate_agreement(population, row, col, external)
-    p_flip = np.exp(-agreement / alpha) if agreement > 0 else 1
+    row = np.random.randint(0, n_rows)  # Random row
+    col = np.random.randint(0, n_cols)  # Random column
+    agreement = calculate_agreement(population, row, col, external)  # Calculate agreement
+    p_flip = np.exp(-agreement / alpha) if agreement > 0 else 1  # Calculate probability of flipping
     if np.random.random() < p_flip:
-        population[row, col] *= -1
+        population[row, col] *= -1  # Flip the cell's state
+
 
 def plot_ising(im, population):
     '''
-    This function will display a plot of the Ising model
+    Updates the plot for the Ising model simulation with the current state of the population grid.
     '''
     new_im = np.array([[255 if val == -1 else 1 for val in rows] for rows in population]).astype(np.int8)
     im.set_data(new_im)
-    # Pause to update the image
-    plt.pause(0.1)
+    plt.pause(0.1)  # Pause to update the image visually
+
 
 def test_ising():
     """
-    Testing the calculate_agreement function of the Ising model
+    Runs several assertions to test the `calculate_agreement` function, ensuring its correctness.
     """
     print("Testing ising model calculations")
     population = -np.ones((3, 3))
+    # Several tests with different configurations and external influences
     assert(calculate_agreement(population,1,1)==4), "Test 1"
-
     population[1, 1] = 1.
     assert(calculate_agreement(population,1,1)==-4), "Test 2"
-
     population[0, 1] = 1.
     assert(calculate_agreement(population,1,1)==-2), "Test 3"
-
     population[1, 0] = 1.
     assert(calculate_agreement(population,1,1)==0), "Test 4"
-
     population[2, 1] = 1.
     assert(calculate_agreement(population,1,1)==2), "Test 5"
-
     population[1, 2] = 1.
     assert(calculate_agreement(population,1,1)==4), "Test 6"
-
-    # Testing the impact of external opinions
-    "Testing external pull"
     population = -np.ones((3, 3))
     assert(calculate_agreement(population, 1, 1, 1)==3), "Test 7"
     assert(calculate_agreement(population, 1, 1, -1)==5), "Test 8"
     assert (calculate_agreement(population, 1, 1, 10) ==-6), "Test 9"
     assert (calculate_agreement(population, 1, 1, -10) ==14), "Test 10"
-
     print("Tests passed")
 
+
 def ising_main(population, alpha=None, external=0.0):
+    '''
+    Main function to run the Ising model simulation over a number of steps, updating the visualization.
+    '''
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_axis_off()
     im = ax.imshow(population, interpolation='none', cmap='RdPu_r')
 
-    # Iterating an update 100 times
-    for frame in range(100):
-        # Iterating single steps 1000 times to form an update
-        for step in range(1000):
+    for frame in range(100):  # Number of updates
+        for step in range(1000):  # Number of iterations per update
             ising_step(population, external, alpha)
         print('Step:', frame, end='\r')
         plot_ising(im, population)
 
     plt.show()
+
+
 def main():
+    '''
+    Main function to parse arguments and  initiate the simulation or testing based
+    on the user's input.
+    '''
     parser = argparse.ArgumentParser(description='Run the Ising model simulation.')
     parser.add_argument('-ising_model', action='store_true', help='Run the Ising model simulation')
     parser.add_argument('-external', type=float, default=0.0, help='External influence on opinions')
     parser.add_argument('-alpha', type=float, default=1.0, help='Tolerance level of society')
     parser.add_argument('-test_ising', action='store_true',help='Run the test functions')
     args = parser.parse_args()
+
     if args.test_ising:
         test_ising()
     if args.ising_model:
-        size = (100, 100)  # Example size, can be changed as needed
+        size = (100, 100)
         population = np.random.choice([-1, 1], size=size)
         ising_main(population, alpha=args.alpha, external=args.external)
 
